@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="version" content="S5 1.1" />
+  <meta name="author" content="Samuel E. DeWitt" />
+  <title>Multiple Imputation in Stata: A Brief Tutorial</title>
+  <style type="text/css">
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!-- configuration parameters -->
+  <meta name="defaultView" content="slideshow" />
+  <meta name="controlVis" content="hidden" />
+  <!-- style sheet links -->
+  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/slides.css" type="text/css" media="projection" id="slideProj" />
+  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/print.css" type="text/css" media="print" id="slidePrint" />
+  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/opera.css" type="text/css" media="projection" id="operaFix" />
+  <!-- S5 JS -->
+  <script src="C:/Users/sd662/ado/plus/m/s5/default/slides.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="layout">
+<div id="controls"></div>
+<div id="currentSlide"></div>
+<div id="header"></div>
+<div id="footer">
+  <h1>16 Mar 2025</h1>
+  <h2>Multiple Imputation in Stata: A Brief Tutorial</h2>
+</div>
+</div>
+<div class="presentation">
+<div class="title-slide slide">
+  <h1 class="title">Multiple Imputation in Stata: A Brief Tutorial</h1>
+  <h3 class="author">Samuel E. DeWitt</h3>
+  <h4 class="date">16 Mar 2025</h4>
+</div>
+<div id="introduction" class="slide section level1">
+<h1>Introduction</h1>
+<p>A big ol’ caveat at the outset - I am by no means an expert in
+multiple imputation, but I do have some limited experience that I will
+share today using a simple data set from the NLSY97.</p>
+<p>Much of this is based on a lecture Robert Apel delivered when I was
+still a student at Rutgers (in what we call <em>the before times</em>),
+so he gets a good deal of the credit here, especially for <strong>all of
+the mistakes</strong>. Those are entirely his and I take no
+responsibility for them.</p>
+</div>
+<div id="other-better-resources" class="slide section level1">
+<h1>Other (Better!) Resources</h1>
+<p>People much smarter than me (and Bob) have written textbooks on this,
+so please consult those before relying strictly on what I present
+here.</p>
+<ol style="list-style-type: decimal">
+<li>Little and Rubin (2002), <em>Statistical Analysis with Missing
+Data</em></li>
+<li>Rubin (1987), <em>Multiple Imputation for Nonresponse in
+Surveys</em></li>
+<li>Schafer (1997), <em>Analysis of Incomplete Multivariate
+Data</em></li>
+</ol>
+</div>
+<div id="multiple-imputation-terminology---defining-missingness"
+class="slide section level1">
+<h1>Multiple Imputation Terminology - Defining Missingness</h1>
+<p>I suppose the most important thing to start with is to provide some
+definitions for important multiple imputation terms.</p>
+</div>
+<div id="missing-completely-at-random-mcar"
+class="slide section level1">
+<h1>Missing Completely at Random (MCAR)</h1>
+<ul>
+<li>If values for a variable, <span
+class="math inline"><em>Y</em></span>, are missing completely at random,
+then it is assumed that:
+<ul>
+<li>The probability that <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
+does not depend on <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span> or on the
+value of <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span></li>
+<li>Therefore, missingness is not related to <em>observable</em> or
+<em>unobservable</em> variables</li>
+<li>Analysis is unbiased if you use listwise deletion (but see
+below!)</li>
+</ul></li>
+<li>Example - someone accidentally skipping a question on an online
+survey due to a browser glitch</li>
+</ul>
+<p><strong>Can this be proven?</strong> I suppose so, in some version of
+the universe where we know everything about everything forever and
+always, inclusive of past and future events.</p>
+<p><strong>Can this be disproven?</strong> Yes, pretty easily. If you
+run some tests of proportions (1 = not missing, 0 = missing) using
+observed variables a significant test statistic provides indication that
+missingness is <em>not</em> completely at random.</p>
+</div>
+<div id="missing-at-random-mar" class="slide section level1">
+<h1>Missing at Random (MAR)</h1>
+<ul>
+<li>Probability that <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
+depends only on <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span> but not on
+the value of <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span>, conditional
+on <span class="math inline"><em>X</em><sub><em>i</em></sub></span>
+<ul>
+<li>Missingness depends only on observables, but not on
+unobservables.</li>
+<li>Analysis IS biased is you use listwise deletion (but not much we can
+often do about that…)</li>
+</ul></li>
+<li>Example - older online survey takers are less likely to report their
+income, but missignness is essentially random between people of the same
+age
+<ul>
+<li>Age is predictive of missingness <em>overall</em> but not within the
+between participants of the same age or within the same age range</li>
+</ul></li>
+</ul>
+<p><strong>Reality Check:</strong> We usually have to assume values are
+MAR, but taht’s probably not true. The best we can do is take into
+account the observables we do have access to so that the MAR assumption
+is more reasonable.</p>
+</div>
+<div id="missing-not-at-random-mnar" class="slide section level1">
+<h1>Missing Not at Random (MNAR)</h1>
+</div>
+<div id="summarize-the-nlsy97" class="slide section level1">
+<h1>Summarize the NLSY97</h1>
+<pre class='stata'>. sysuse auto, clear
+(1978 automobile data)
+
+. summarize mpg weight price
+
+    Variable │        Obs        Mean    Std. dev.       Min        Max
+─────────────┼─────────────────────────────────────────────────────────
+         mpg │         74     21.2973    5.785503         12         41
+      weight │         74    3019.459    777.1936       1760       4840
+       price │         74    6165.257    2949.496       3291      15906
+</pre>
+</div>
+</div>
+</body>
+</html>

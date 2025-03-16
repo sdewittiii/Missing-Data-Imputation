@@ -1,0 +1,54 @@
+---
+title: "Multiple Imputation in Stata: A Brief Tutorial"
+author: "Samuel E. DeWitt"
+date: "`s c(current_date)`"
+output: html_document
+---
+
+# Introduction
+
+A big ol' caveat at the outset - I am by no means an expert in multiple imputation, but I do have some limited experience that I will share today using a simple data set from the NLSY97. 
+
+Much of this is based on a lecture Robert Apel delivered when I was still a student at Rutgers (in what we call *the before times*), so he gets a good deal of the credit here, especially for **all of the mistakes**. Those are entirely his and I take no responsibility for them. 
+
+# Other (Better!) Resources
+
+People much smarter than me (and Bob) have written textbooks on this, so please consult those before relying strictly on what I present here. 
+
+1. Little and Rubin (2002), *Statistical Analysis with Missing Data*
+2. Rubin (1987), *Multiple Imputation for Nonresponse in Surveys*
+3. Schafer (1997), *Analysis of Incomplete Multivariate Data*
+
+# Multiple Imputation Terminology - Defining Missingness
+I suppose the most important thing to start with is to provide some definitions for important multiple imputation terms. 
+
+# Missing Completely at Random (MCAR)
+- If values for a variable, $Y$, are missing completely at random, then it is assumed that:
+    - The probability that $Y_{i}$ is missing does not depend on $X_{i}$ or on the value of $Y_{i}$
+    - Therefore, missingness is not related to *observable* or *unobservable* variables
+    - Analysis is unbiased if you use listwise deletion (but see below!)
+- Example - someone accidentally skipping a question on an online survey due to a browser glitch
+
+**Can this be proven?**
+I suppose so, in some version of the universe where we know everything about everything forever and always, inclusive of past and future events. 
+
+**Can this be disproven?**
+Yes, pretty easily. If you run some tests of proportions (1 = not missing, 0 = missing) using observed variables a significant test statistic provides indication that missingness is *not* completely at random. 
+
+# Missing at Random (MAR)
+- Probability that $Y_{i}$ is missing depends only on $X_{i}$ but not on the value of $Y_{i}$, conditional on $X_{i}$
+    - Missingness depends only on observables, but not on unobservables. 
+    - Analysis IS biased is you use listwise deletion (but not much we can often do about that...)
+- Example - older online survey takers are less likely to report their income, but missignness is essentially random between people of the same age
+    - Age is predictive of missingness *overall* but not within the between participants of the same age or within the same age range
+
+**Reality Check:** We usually have to assume values are MAR, but that's probably not true. The best we can do is take into account the observables we do have access to so that the MAR assumption is more reasonable. 
+
+# Missing Not at Random (MNAR)
+
+# Summarize the NLSY97
+```{s}    
+sysuse auto, clear
+summarize mpg weight price
+```
+
