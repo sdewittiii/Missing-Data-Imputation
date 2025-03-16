@@ -3,30 +3,18 @@
       name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\00_mi_in_Stata_Apr25.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res}16 Mar 2025, 18:33:26
+ {txt}opened on:  {res}16 Mar 2025, 19:22:21
 {txt}
 {com}. //_1
 . display c(current_date)
 {res}16 Mar 2025
-{txt}
-{com}. //_2
-. sysuse auto, clear
-{txt}(1978 automobile data)
-
-{com}. summarize mpg weight price
-
-{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
-{hline 13}{c +}{hline 57}
-{space 9}mpg {c |}{res}         74     21.2973    5.785503         12         41
-{txt}{space 6}weight {c |}{res}         74    3019.459    777.1936       1760       4840
-{txt}{space 7}price {c |}{res}         74    6165.257    2949.496       3291      15906
 {txt}
 {com}. //_^
 . log close
       {txt}name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\00_mi_in_Stata_Apr25.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res}16 Mar 2025, 18:33:26
+ {txt}closed on:  {res}16 Mar 2025, 19:22:21
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

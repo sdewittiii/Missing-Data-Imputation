@@ -88,7 +88,7 @@ class="slide section level1">
 <ul>
 <li>If values for a variable, <span
 class="math inline"><em>Y</em></span>, are missing completely at random,
-then it is assumed that:
+then it is assumed that
 <ul>
 <li>The probability that <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
@@ -97,7 +97,7 @@ class="math inline"><em>X</em><sub><em>i</em></sub></span> or on the
 value of <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span></li>
 <li>Therefore, missingness is not related to <em>observable</em> or
-<em>unobservable</em> variables</li>
+<em>unobservable</em> values</li>
 <li>Analysis is unbiased if you use listwise deletion (but see
 below!)</li>
 </ul></li>
@@ -123,8 +123,8 @@ the value of <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span>, conditional
 on <span class="math inline"><em>X</em><sub><em>i</em></sub></span>
 <ul>
-<li>Missingness depends only on observables, but not on
-unobservables.</li>
+<li>Missingness depends only on observable information, but not on
+unobservable information.</li>
 <li>Analysis IS biased is you use listwise deletion (but not much we can
 often do about that…)</li>
 </ul></li>
@@ -137,26 +137,37 @@ between participants of the same age or within the same age range</li>
 </ul></li>
 </ul>
 <p><strong>Reality Check:</strong> We usually have to assume values are
-MAR, but taht’s probably not true. The best we can do is take into
+MAR, but that’s probably not true. The best we can do is take into
 account the observables we do have access to so that the MAR assumption
 is more reasonable.</p>
 </div>
 <div id="missing-not-at-random-mnar" class="slide section level1">
 <h1>Missing Not at Random (MNAR)</h1>
+<ul>
+<li>Probability that <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
+depends on missing values of <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span>, even after
+accounting for <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span>
+<ul>
+<li>Missingness is related to the values in <span
+class="math inline"><em>Y</em><sub><em>i</em></sub></span> that you
+<em>do not</em> observe</li>
+</ul></li>
+<li>Example: <strong>Because</strong> someone has a higher income, they
+are unlikely to report it on an online survey (prefer not to
+disclose).</li>
+</ul>
+<p><strong>What Does it All Mean?</strong> Imputing missing values will
+not solve this problem. If missingness pertains to an important variable
+for your analysis, you might need to run <strong>selection</strong>
+models to account for this (e.g., Heckman Two-Step correction) but you
+are probably better off finding better data (easier said than done, I
+know…).</p>
 </div>
 <div id="summarize-the-nlsy97" class="slide section level1">
 <h1>Summarize the NLSY97</h1>
-<pre class='stata'>. sysuse auto, clear
-(1978 automobile data)
-
-. summarize mpg weight price
-
-    Variable │        Obs        Mean    Std. dev.       Min        Max
-─────────────┼─────────────────────────────────────────────────────────
-         mpg │         74     21.2973    5.785503         12         41
-      weight │         74    3019.459    777.1936       1760       4840
-       price │         74    6165.257    2949.496       3291      15906
-</pre>
 </div>
 </div>
 </body>

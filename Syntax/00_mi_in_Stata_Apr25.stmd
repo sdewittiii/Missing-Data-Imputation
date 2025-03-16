@@ -23,11 +23,11 @@ People much smarter than me (and Bob) have written textbooks on this, so please 
 I suppose the most important thing to start with is to provide some definitions for important multiple imputation terms. 
 
 # Missing Completely at Random (MCAR)
-- If values for a variable, $Y$, are missing completely at random, then it is assumed that:
-    - The probability that $Y_{i}$ is missing does not depend on $X_{i}$ or on the value of $Y_{i}$
-    - Therefore, missingness is not related to *observable* or *unobservable* values
-    - Analysis is unbiased if you use listwise deletion (but see below!)
-- Example - someone accidentally skipping a question on an online survey due to a browser glitch
++ If values for a variable, $Y$, are missing completely at random, then it is assumed that
+  + The probability that $Y_{i}$ is missing does not depend on $X_{i}$ or on the value of $Y_{i}$
+  + Therefore, missingness is not related to *observable* or *unobservable* values
+  + Analysis is unbiased if you use listwise deletion (but see below!)
++ Example - someone accidentally skipping a question on an online survey due to a browser glitch
 
 **Can this be proven?**
 I suppose so, in some version of the universe where we know everything about everything forever and always, inclusive of past and future events. 
@@ -36,24 +36,25 @@ I suppose so, in some version of the universe where we know everything about eve
 Yes, pretty easily. If you run some tests of proportions (1 = not missing, 0 = missing) using observed variables a significant test statistic provides indication that missingness is *not* completely at random. 
 
 # Missing at Random (MAR)
-- Probability that $Y_{i}$ is missing depends only on $X_{i}$ but not on the value of $Y_{i}$, conditional on $X_{i}$
-    - Missingness depends only on observable information, but not on unobservable information. 
-    - Analysis IS biased is you use listwise deletion (but not much we can often do about that...)
-- Example - older online survey takers are less likely to report their income, but missignness is essentially random between people of the same age
-    - Age is predictive of missingness *overall* but not within the between participants of the same age or within the same age range
++ Probability that $Y_{i}$ is missing depends only on $X_{i}$ but not on the value of $Y_{i}$, conditional on $X_{i}$
+  + Missingness depends only on observable information, but not on unobservable information. 
+  + Analysis IS biased is you use listwise deletion (but not much we can often do about that...)
++ Example - older online survey takers are less likely to report their income, but missignness is essentially random between people of the same age
+  + Age is predictive of missingness *overall* but not within the between participants of the same age or within the same age range
 
 **Reality Check:** We usually have to assume values are MAR, but that's probably not true. The best we can do is take into account the observables we do have access to so that the MAR assumption is more reasonable. 
 
 # Missing Not at Random (MNAR)
-- Probability that $Y_{i}$ is missing depends on missing values of $Y_{i}$, even after accounting for $X_{i}$
-    - Missingness is related to the values in $Y_{i}$ that you *do not* observe
-- Example - **Because** someone has a higher income, they are unlikely to report it on an online survey (prefer not to disclose). 
++ Probability that $Y_{i}$ is missing depends on missing values of $Y_{i}$, even after accounting for $X_{i}$
+  + Missingness is related to the values in $Y_{i}$ that you *do not* observe
++ Example: **Because** someone has a higher income, they are unlikely to report it on an online survey (prefer not to disclose). 
 
-**What Does it All Mean?** Imputing missing values will not solve this problem. If it pertains to an important variable for your analysis, you might need to run **selection** models to account for this (e.g., Heckman Two-Step correction). 
+**What Does it All Mean?** Imputing missing values will not solve this problem. If missingness pertains to an important variable for your analysis, you might need to run **selection** models to account for this (e.g., Heckman Two-Step correction) but you are probably better off finding better data (easier said than done, I know...). 
+
+# How Do I Know Which Definition Applies to My Data?
+
+Littles MCAR Test
 
 # Summarize the NLSY97
-```{s}    
-sysuse auto, clear
-summarize mpg weight price
-```
+
 
