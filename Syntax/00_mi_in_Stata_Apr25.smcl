@@ -3,18 +3,18 @@
       name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\00_mi_in_Stata_Apr25.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res}16 Mar 2025, 19:22:21
+ {txt}opened on:  {res}17 Mar 2025, 08:04:40
 {txt}
 {com}. //_1
 . display c(current_date)
-{res}16 Mar 2025
+{res}17 Mar 2025
 {txt}
 {com}. //_^
 . log close
       {txt}name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\00_mi_in_Stata_Apr25.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res}16 Mar 2025, 19:22:21
+ {txt}closed on:  {res}17 Mar 2025, 08:04:40
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

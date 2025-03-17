@@ -41,7 +41,7 @@
 <div id="currentSlide"></div>
 <div id="header"></div>
 <div id="footer">
-  <h1>16 Mar 2025</h1>
+  <h1>17 Mar 2025</h1>
   <h2>Multiple Imputation in Stata: A Brief Tutorial</h2>
 </div>
 </div>
@@ -49,7 +49,7 @@
 <div class="title-slide slide">
   <h1 class="title">Multiple Imputation in Stata: A Brief Tutorial</h1>
   <h3 class="author">Samuel E. DeWitt</h3>
-  <h4 class="date">16 Mar 2025</h4>
+  <h4 class="date">17 Mar 2025</h4>
 </div>
 <div id="introduction" class="slide section level1">
 <h1>Introduction</h1>
@@ -59,8 +59,7 @@ share today using a simple data set from the NLSY97.</p>
 <p>Much of this is based on a lecture Robert Apel delivered when I was
 still a student at Rutgers (in what we call <em>the before times</em>),
 so he gets a good deal of the credit here, especially for <strong>all of
-the mistakes</strong>. Those are entirely his and I take no
-responsibility for them.</p>
+the mistakes</strong>.</p>
 </div>
 <div id="other-better-resources" class="slide section level1">
 <h1>Other (Better!) Resources</h1>
@@ -98,19 +97,38 @@ value of <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span></li>
 <li>Therefore, missingness is not related to <em>observable</em> or
 <em>unobservable</em> values</li>
-<li>Analysis is unbiased if you use listwise deletion (but see
-below!)</li>
+<li>Analysis is unbiased if you use listwise deletion (but see next
+slide!)</li>
 </ul></li>
 <li>Example - someone accidentally skipping a question on an online
 survey due to a browser glitch</li>
 </ul>
+</div>
+<div id="missing-completely-at-random-mcar-1"
+class="slide section level1">
+<h1>Missing Completely at Random (MCAR)</h1>
 <p><strong>Can this be proven?</strong> I suppose so, in some version of
 the universe where we know everything about everything forever and
 always, inclusive of past and future events.</p>
+<p>Time for a less sarcastic response - in very specific scenarios where
+a glitch or random error causes some information <strong>not to
+be</strong> collected from someone (e.g., a programming glitch skips a
+page for an online survey) then MCAR is a reasonable assumption.</p>
+<p>BUT…what if this happens at the very outset of the survey and only
+affects your first 10% of respondents? Might those respondents be
+different from later respondents in some important way (e.g., more
+conscientious, attentive, etc…)? Now we’re back to doubting the MCAR
+assumption.</p>
+</div>
+<div id="missing-completely-at-random" class="slide section level1">
+<h1>Missing Completely at Random</h1>
 <p><strong>Can this be disproven?</strong> Yes, pretty easily. If you
 run some tests of proportions (1 = not missing, 0 = missing) using
 observed variables a significant test statistic provides indication that
 missingness is <em>not</em> completely at random.</p>
+<p>However, these tests are limited by what information you are able to
+<strong>observe</strong>. You can’t run a proportions test for variables
+you didn’t think to, or are very difficult to, collect.</p>
 </div>
 <div id="missing-at-random-mar" class="slide section level1">
 <h1>Missing at Random (MAR)</h1>
@@ -129,13 +147,16 @@ unobservable information.</li>
 often do about that…)</li>
 </ul></li>
 <li>Example - older online survey takers are less likely to report their
-income, but missignness is essentially random between people of the same
+income, but missingness is essentially random between people of the same
 age
 <ul>
-<li>Age is predictive of missingness <em>overall</em> but not within the
-between participants of the same age or within the same age range</li>
+<li>Age is predictive of missingness <em>overall</em> but not between
+participants of the same age or within the same age range</li>
 </ul></li>
 </ul>
+</div>
+<div id="missing-at-random-mar-1" class="slide section level1">
+<h1>Missing at Random (MAR)</h1>
 <p><strong>Reality Check:</strong> We usually have to assume values are
 MAR, but that’s probably not true. The best we can do is take into
 account the observables we do have access to so that the MAR assumption
@@ -159,12 +180,20 @@ class="math inline"><em>Y</em><sub><em>i</em></sub></span> that you
 are unlikely to report it on an online survey (prefer not to
 disclose).</li>
 </ul>
+</div>
+<div id="missing-not-at-random-mnar-1" class="slide section level1">
+<h1>Missing Not at Random (MNAR)</h1>
 <p><strong>What Does it All Mean?</strong> Imputing missing values will
 not solve this problem. If missingness pertains to an important variable
 for your analysis, you might need to run <strong>selection</strong>
 models to account for this (e.g., Heckman Two-Step correction) but you
 are probably better off finding better data (easier said than done, I
 know…).</p>
+</div>
+<div id="how-do-i-know-which-definition-applies-to-my-data"
+class="slide section level1">
+<h1>How Do I Know Which Definition Applies to My Data?</h1>
+<p>Little’s MCAR Test</p>
 </div>
 <div id="summarize-the-nlsy97" class="slide section level1">
 <h1>Summarize the NLSY97</h1>

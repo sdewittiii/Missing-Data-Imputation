@@ -9,7 +9,7 @@ output: html_document
 
 A big ol' caveat at the outset - I am by no means an expert in multiple imputation, but I do have some limited experience that I will share today using a simple data set from the NLSY97. 
 
-Much of this is based on a lecture Robert Apel delivered when I was still a student at Rutgers (in what we call *the before times*), so he gets a good deal of the credit here, especially for **all of the mistakes**. Those are entirely his and I take no responsibility for them. 
+Much of this is based on a lecture Robert Apel delivered when I was still a student at Rutgers (in what we call *the before times*), so he gets a good deal of the credit here, especially for **all of the mistakes**. 
 
 # Other (Better!) Resources
 
@@ -26,21 +26,33 @@ I suppose the most important thing to start with is to provide some definitions 
 + If values for a variable, $Y$, are missing completely at random, then it is assumed that
   + The probability that $Y_{i}$ is missing does not depend on $X_{i}$ or on the value of $Y_{i}$
   + Therefore, missingness is not related to *observable* or *unobservable* values
-  + Analysis is unbiased if you use listwise deletion (but see below!)
+  + Analysis is unbiased if you use listwise deletion (but see next slide!)
 + Example - someone accidentally skipping a question on an online survey due to a browser glitch
+
+# Missing Completely at Random (MCAR)
 
 **Can this be proven?**
 I suppose so, in some version of the universe where we know everything about everything forever and always, inclusive of past and future events. 
 
+Time for a less sarcastic response - in very specific scenarios where a glitch or random error causes some information **not to be** collected from someone (e.g., a programming glitch skips a page for an online survey) then MCAR is a reasonable assumption.
+
+BUT...what if this happens at the very outset of the survey and only affects your first 10% of respondents? Might those respondents be different from later respondents in some important way (e.g., more conscientious, attentive, etc...)? Now we're back to doubting the MCAR assumption. 
+
+# Missing Completely at Random
+
 **Can this be disproven?**
 Yes, pretty easily. If you run some tests of proportions (1 = not missing, 0 = missing) using observed variables a significant test statistic provides indication that missingness is *not* completely at random. 
+
+However, these tests are limited by what information you are able to **observe**. You can't run a proportions test for variables you didn't think to, or are very difficult to, collect. 
 
 # Missing at Random (MAR)
 + Probability that $Y_{i}$ is missing depends only on $X_{i}$ but not on the value of $Y_{i}$, conditional on $X_{i}$
   + Missingness depends only on observable information, but not on unobservable information. 
   + Analysis IS biased is you use listwise deletion (but not much we can often do about that...)
-+ Example - older online survey takers are less likely to report their income, but missignness is essentially random between people of the same age
-  + Age is predictive of missingness *overall* but not within the between participants of the same age or within the same age range
++ Example - older online survey takers are less likely to report their income, but missingness is essentially random between people of the same age
+  + Age is predictive of missingness *overall* but not between participants of the same age or within the same age range
+
+# Missing at Random (MAR)
 
 **Reality Check:** We usually have to assume values are MAR, but that's probably not true. The best we can do is take into account the observables we do have access to so that the MAR assumption is more reasonable. 
 
@@ -49,11 +61,13 @@ Yes, pretty easily. If you run some tests of proportions (1 = not missing, 0 = m
   + Missingness is related to the values in $Y_{i}$ that you *do not* observe
 + Example: **Because** someone has a higher income, they are unlikely to report it on an online survey (prefer not to disclose). 
 
+# Missing Not at Random (MNAR)
+
 **What Does it All Mean?** Imputing missing values will not solve this problem. If missingness pertains to an important variable for your analysis, you might need to run **selection** models to account for this (e.g., Heckman Two-Step correction) but you are probably better off finding better data (easier said than done, I know...). 
 
 # How Do I Know Which Definition Applies to My Data?
 
-Littles MCAR Test
+Little's MCAR Test
 
 # Summarize the NLSY97
 
