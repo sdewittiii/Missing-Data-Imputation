@@ -1,13 +1,157 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
-  <meta name="version" content="S5 1.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Samuel E. DeWitt" />
   <title>Multiple Imputation in Stata: A Brief Tutorial</title>
-  <style type="text/css">
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -24,35 +168,53 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <!-- configuration parameters -->
-  <meta name="defaultView" content="slideshow" />
-  <meta name="controlVis" content="hidden" />
-  <!-- style sheet links -->
-  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/slides.css" type="text/css" media="projection" id="slideProj" />
-  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
-  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/print.css" type="text/css" media="print" id="slidePrint" />
-  <link rel="stylesheet" href="C:/Users/sd662/ado/plus/m/s5/default/opera.css" type="text/css" media="projection" id="operaFix" />
-  <!-- S5 JS -->
-  <script src="C:/Users/sd662/ado/plus/m/s5/default/slides.js" type="text/javascript"></script>
+<style>
+/* CSS for Markstat 2.0 using Pandoc 2.0 */
+body{padding:14px 28px; max-width:45em;}
+body, table {font-family: Helvetica, Arial, Sans-serif; font-size: 14px;}
+h1, h2, h3, h4 {font-weight: normal; color: #3366cc}
+h1 {font-size: 200%;}
+h2 {font-size: 150%;}
+h3 {font-size: 120%;}
+h4 {font-size: 100%; font-weight:bold}
+img.center {display:block; margin-left:auto; margin-right:auto}
+.small{font-size:8pt;}
+a {color: black;}
+a:visited {color: #808080;}
+a.plain {text-decoration:none;}
+a.plain:hover {text-decoration:underline;}
+.em {font-weight:bold;}
+pre, code {font-family: "lucida console", monospace;}
+pre.stata {font-size:13px; line-height:13px;}
+pre {padding:8px; border:1px solid #c0c0c0; border-radius:8px; background-color:#fdfdfd;}
+code {color:#3366cc; background-color:#fafafa;}
+pre code { color:black; background-color:white}
+/* Added for Pandoc */
+figure > img, div.figure > img {display:block; margin:auto}
+figcaption, p.caption {text-align:center; font-weight:bold; color:#3366cc;}
+h1.title {text-align:center; margin-bottom:0}
+p.author, h2.author {font-style:italic; text-align:center;margin-top:4px;margin-bottom:0}
+p.date, h3.date {text-align:center;margin-top:4px; margin-bottom:0}
+/* Tables*/
+table { margin:auto; border-collapse:collapse; }
+table caption { margin-bottom:1ex;}
+td {padding:0 0 0 0} /* override */
+table:not([class]) th { padding:4px 6px } 
+table:not([class]) td { padding:4px 6px } 
+table:not([class]) thead tr:first-child th {border-top:1px solid black; padding-top:6px}
+table:not([class]) thead tr:last-child  th {padding-bottom:6px}
+table:not([class]) tbody tr:first-child td {border-top:1px solid black; padding-top:6px}
+table:not([class]) tbody tr:last-child  td {padding-bottom:6px;}
+table:not([class]) tbody:last-child tr:last-child td {border-bottom:1px solid black;}
+</style>
 </head>
 <body>
-<div class="layout">
-<div id="controls"></div>
-<div id="currentSlide"></div>
-<div id="header"></div>
-<div id="footer">
-  <h1>17 Mar 2025</h1>
-  <h2>Multiple Imputation in Stata: A Brief Tutorial</h2>
-</div>
-</div>
-<div class="presentation">
-<div class="title-slide slide">
-  <h1 class="title">Multiple Imputation in Stata: A Brief Tutorial</h1>
-  <h3 class="author">Samuel E. DeWitt</h3>
-  <h4 class="date">17 Mar 2025</h4>
-</div>
-<div id="introduction" class="slide section level1">
-<h1>Introduction</h1>
+<header id="title-block-header">
+<h1 class="title">Multiple Imputation in Stata: A Brief Tutorial</h1>
+<p class="author">Samuel E. DeWitt</p>
+<p class="date">4 Apr 2025</p>
+</header>
+<h1 id="introduction">Introduction</h1>
 <p>A big ol’ caveat at the outset - I am by no means an expert in
 multiple imputation, but I do have some limited experience that I will
 share today using a simple data set from the NLSY97.</p>
@@ -60,13 +222,11 @@ share today using a simple data set from the NLSY97.</p>
 still a student at Rutgers (in what we call <em>the before times</em>),
 so he gets a good deal of the credit here, especially for <strong>all of
 the mistakes</strong>.</p>
-</div>
-<div id="other-better-resources" class="slide section level1">
-<h1>Other (Better!) Resources</h1>
+<h1 id="other-better-resources">Other (Better!) Resources</h1>
 <p>People much smarter than me (and Bob) have written textbooks on this,
 so please consult those before relying strictly on what I present
 here.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Little and Rubin (2002), <em>Statistical Analysis with Missing
 Data</em></li>
 <li>Rubin (1987), <em>Multiple Imputation for Nonresponse in
@@ -74,16 +234,12 @@ Surveys</em></li>
 <li>Schafer (1997), <em>Analysis of Incomplete Multivariate
 Data</em></li>
 </ol>
-</div>
-<div id="multiple-imputation-terminology---defining-missingness"
-class="slide section level1">
-<h1>Multiple Imputation Terminology - Defining Missingness</h1>
+<h1 id="multiple-imputation-terminology---defining-missingness">Multiple
+Imputation Terminology - Defining Missingness</h1>
 <p>I suppose the most important thing to start with is to provide some
 definitions for important multiple imputation terms.</p>
-</div>
-<div id="missing-completely-at-random-mcar"
-class="slide section level1">
-<h1>Missing Completely at Random (MCAR)</h1>
+<h1 id="missing-completely-at-random-mcar">Missing Completely at Random
+(MCAR)</h1>
 <ul>
 <li>If values for a variable, <span
 class="math inline"><em>Y</em></span>, are missing completely at random,
@@ -103,25 +259,21 @@ slide!)</li>
 <li>Example - someone accidentally skipping a question on an online
 survey due to a browser glitch</li>
 </ul>
-</div>
-<div id="missing-completely-at-random-mcar-1"
-class="slide section level1">
-<h1>Missing Completely at Random (MCAR)</h1>
+<h1 id="missing-completely-at-random-mcar-1">Missing Completely at
+Random (MCAR)</h1>
 <p><strong>Can this be proven?</strong> I suppose so, in some version of
 the universe where we know everything about everything forever and
-always, inclusive of past and future events.</p>
+always, inclusive of past <strong>and</strong> future events.</p>
 <p>Time for a less sarcastic response - in very specific scenarios where
 a glitch or random error causes some information <strong>not to
 be</strong> collected from someone (e.g., a programming glitch skips a
 page for an online survey) then MCAR is a reasonable assumption.</p>
 <p>BUT…what if this happens at the very outset of the survey and only
-affects your first 10% of respondents? Might those respondents be
+affects the first 10% of respondents? Might those respondents be
 different from later respondents in some important way (e.g., more
 conscientious, attentive, etc…)? Now we’re back to doubting the MCAR
 assumption.</p>
-</div>
-<div id="missing-completely-at-random" class="slide section level1">
-<h1>Missing Completely at Random</h1>
+<h1 id="missing-completely-at-random">Missing Completely at Random</h1>
 <p><strong>Can this be disproven?</strong> Yes, pretty easily. If you
 run some tests of proportions (1 = not missing, 0 = missing) using
 observed variables a significant test statistic provides indication that
@@ -129,9 +281,7 @@ missingness is <em>not</em> completely at random.</p>
 <p>However, these tests are limited by what information you are able to
 <strong>observe</strong>. You can’t run a proportions test for variables
 you didn’t think to, or are very difficult to, collect.</p>
-</div>
-<div id="missing-at-random-mar" class="slide section level1">
-<h1>Missing at Random (MAR)</h1>
+<h1 id="missing-at-random-mar">Missing at Random (MAR)</h1>
 <ul>
 <li>Probability that <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
@@ -154,16 +304,12 @@ age
 participants of the same age or within the same age range</li>
 </ul></li>
 </ul>
-</div>
-<div id="missing-at-random-mar-1" class="slide section level1">
-<h1>Missing at Random (MAR)</h1>
-<p><strong>Reality Check:</strong> We usually have to assume values are
-MAR, but that’s probably not true. The best we can do is take into
-account the observables we do have access to so that the MAR assumption
-is more reasonable.</p>
-</div>
-<div id="missing-not-at-random-mnar" class="slide section level1">
-<h1>Missing Not at Random (MNAR)</h1>
+<h1 id="missing-at-random-mar-1">Missing at Random (MAR)</h1>
+<p><strong>Reality Check</strong></p>
+<p>We usually have to assume values are MAR, but that’s probably not
+true. The best we can do is take into account the observables we do have
+access to so that the MAR assumption is more reasonable.</p>
+<h1 id="missing-not-at-random-mnar">Missing Not at Random (MNAR)</h1>
 <ul>
 <li>Probability that <span
 class="math inline"><em>Y</em><sub><em>i</em></sub></span> is missing
@@ -180,24 +326,17 @@ class="math inline"><em>Y</em><sub><em>i</em></sub></span> that you
 are unlikely to report it on an online survey (prefer not to
 disclose).</li>
 </ul>
-</div>
-<div id="missing-not-at-random-mnar-1" class="slide section level1">
-<h1>Missing Not at Random (MNAR)</h1>
-<p><strong>What Does it All Mean?</strong> Imputing missing values will
-not solve this problem. If missingness pertains to an important variable
-for your analysis, you might need to run <strong>selection</strong>
-models to account for this (e.g., Heckman Two-Step correction) but you
-are probably better off finding better data (easier said than done, I
-know…).</p>
-</div>
-<div id="how-do-i-know-which-definition-applies-to-my-data"
-class="slide section level1">
-<h1>How Do I Know Which Definition Applies to My Data?</h1>
-<p>Little’s MCAR Test</p>
-</div>
-<div id="summarize-the-nlsy97" class="slide section level1">
-<h1>Summarize the NLSY97</h1>
-</div>
-</div>
+<h1 id="missing-not-at-random-mnar-1">Missing Not at Random (MNAR)</h1>
+<p><strong>What Does it All Mean?</strong></p>
+<p>Imputing missing values will not solve this problem. If missingness
+pertains to an important variable for your analysis, you might need to
+run <strong>selection</strong> models to account for this (e.g., Heckman
+Two-Step correction) but you are probably better off finding better data
+(easier said than done, I know…).</p>
+<h1 id="how-do-i-know-which-definition-applies-to-my-data">How Do I Know
+Which Definition Applies to My Data?</h1>
+<p><strong>Little’s MCAR Test</strong> can at least rule out MCAR for
+you, though it is rare that you’d meet that assumption, anyhow.</p>
+<p><code>s {echo(false)} cd "G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data" use nlsy97_mi_tutorial.dta, clear mcartest age bmi health hh_size male n_marij white</code></p>
 </body>
 </html>

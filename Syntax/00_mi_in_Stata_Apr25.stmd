@@ -2,7 +2,7 @@
 title: "Multiple Imputation in Stata: A Brief Tutorial"
 author: "Samuel E. DeWitt"
 date: "`s c(current_date)`"
-output: html_document
+output: html
 ---
 
 # Introduction
@@ -32,11 +32,11 @@ I suppose the most important thing to start with is to provide some definitions 
 # Missing Completely at Random (MCAR)
 
 **Can this be proven?**
-I suppose so, in some version of the universe where we know everything about everything forever and always, inclusive of past and future events. 
+I suppose so, in some version of the universe where we know everything about everything forever and always, inclusive of past **and** future events. 
 
 Time for a less sarcastic response - in very specific scenarios where a glitch or random error causes some information **not to be** collected from someone (e.g., a programming glitch skips a page for an online survey) then MCAR is a reasonable assumption.
 
-BUT...what if this happens at the very outset of the survey and only affects your first 10% of respondents? Might those respondents be different from later respondents in some important way (e.g., more conscientious, attentive, etc...)? Now we're back to doubting the MCAR assumption. 
+BUT...what if this happens at the very outset of the survey and only affects the first 10% of respondents? Might those respondents be different from later respondents in some important way (e.g., more conscientious, attentive, etc...)? Now we're back to doubting the MCAR assumption.   
 
 # Missing Completely at Random
 
@@ -54,7 +54,9 @@ However, these tests are limited by what information you are able to **observe**
 
 # Missing at Random (MAR)
 
-**Reality Check:** We usually have to assume values are MAR, but that's probably not true. The best we can do is take into account the observables we do have access to so that the MAR assumption is more reasonable. 
+**Reality Check** 
+
+We usually have to assume values are MAR, but that's probably not true. The best we can do is take into account the observables we do have access to so that the MAR assumption is more reasonable. 
 
 # Missing Not at Random (MNAR)
 + Probability that $Y_{i}$ is missing depends on missing values of $Y_{i}$, even after accounting for $X_{i}$
@@ -63,12 +65,14 @@ However, these tests are limited by what information you are able to **observe**
 
 # Missing Not at Random (MNAR)
 
-**What Does it All Mean?** Imputing missing values will not solve this problem. If missingness pertains to an important variable for your analysis, you might need to run **selection** models to account for this (e.g., Heckman Two-Step correction) but you are probably better off finding better data (easier said than done, I know...). 
+**What Does it All Mean?** 
+
+Imputing missing values will not solve this problem. If missingness pertains to an important variable for your analysis, you might need to run **selection** models to account for this (e.g., Heckman Two-Step correction) but you are probably better off finding better data (easier said than done, I know...). 
 
 # How Do I Know Which Definition Applies to My Data?
 
-Little's MCAR Test
+**Little's MCAR Test** can at least rule out MCAR for you, though it is rare that you'd meet that assumption, anyhow.
 
-# Summarize the NLSY97
+
 
 

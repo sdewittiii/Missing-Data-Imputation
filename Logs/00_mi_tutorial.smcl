@@ -1,0 +1,245 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Logs\00_mi_tutorial.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 4 Apr 2025, 13:40:55
+{txt}
+{com}.         
+. ** INFILE DICTIONARY FILE PROVIDED BY NLS EXPLORER      
+.         cd "G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\Cleanup Do Files"
+{res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\Cleanup Do Files
+{txt}
+{com}.         infile using default.dct
+
+{txt}infile dictionary {c -(}
+  R0000100 "PUBID - YTH ID CODE 1997"
+  R0320600 "HOW RS GENL HEALTH? 1997"
+  R0322500 "HEIGHT OF R IN FEET 1997"
+  R0322600 "HEIGHT OF R IN INCHES 1997"
+  R0322700 "WEIGHT OF R - POUNDS 1997"
+  R0358900 "R EVER USE MARIJUANA? 1997"
+  R0359100 "# DAY USE MARIJUANA LAST 30 DAYS 1997"
+  R0536300 "KEY!SEX (SYMBOL) 1997"
+  R0536401 "KEY!BDATE M/Y (SYMBOL) 1997"
+  R0536402 "KEY!BDATE M/Y (SYMBOL) 1997"
+  R1194100 "CV_AGE_INT_DATE 1997"
+  R1205400 "CV_HH_SIZE 1997"
+  R1235800 "CV_SAMPLE_TYPE 1997"
+  R1482600 "KEY!RACE_ETHNICITY (SYMBOL) 1997"
+{c )-}
+
+(8,984 observations read)
+
+{com}.         
+. ** APPLY LABEL VALUES FROM NLS EXPLORER-PROVIDED DO FILE
+.         do default-value-labels.do
+{txt}
+{com}. 
+. label define vlR0000100 0 "0"  1 "1 TO 999"  1000 "1000 TO 1999"  2000 "2000 TO 2999"  3000 "3000 TO 3999"  4000 "4000 TO 4999"  5000 "5000 TO 5999"  6000 "6000 TO 6999"  7000 "7000 TO 7999"  8000 "8000 TO 8999"  9000 "9000 TO 9999" 
+{txt}
+{com}. label values R0000100 vlR0000100
+{txt}
+{com}. 
+. label define vlR0320600 1 "Excellent"  2 "Very good"  3 "Good"  4 "Fair"  5 "Poor" 
+{txt}
+{com}. label values R0320600 vlR0320600
+{txt}
+{com}. 
+. label define vlR0322500 0 "0"  1 "1"  2 "2"  3 "3"  4 "4"  5 "5"  6 "6"  7 "7"  8 "8"  9 "9" 
+{txt}
+{com}. label values R0322500 vlR0322500
+{txt}
+{com}. 
+. label define vlR0322600 0 "0"  1 "1"  2 "2"  3 "3"  4 "4"  5 "5"  6 "6"  7 "7"  8 "8"  9 "9"  10 "10"  11 "11"  12 "12" 
+{txt}
+{com}. label values R0322600 vlR0322600
+{txt}
+{com}. 
+. label define vlR0322700 0 "0"  1 "1 TO 49"  50 "50 TO 99"  100 "100 TO 149"  150 "150 TO 199"  200 "200 TO 249"  250 "250 TO 299"  300 "300 TO 349"  350 "350 TO 399"  400 "400 TO 449"  450 "450 TO 499"  500 "500 TO 999999: 500+" 
+{txt}
+{com}. label values R0322700 vlR0322700
+{txt}
+{com}. 
+. label define vlR0358900 1 "Yes"  0 "No" 
+{txt}
+{com}. label values R0358900 vlR0358900
+{txt}
+{com}. 
+. label define vlR0359100 0 "0"  1 "1 TO 4"  5 "5 TO 9"  10 "10 TO 14"  15 "15 TO 19"  20 "20 TO 24"  25 "25 TO 29"  30 "30" 
+{txt}
+{com}. label values R0359100 vlR0359100
+{txt}
+{com}. 
+. label define vlR0536300 1 "Male"  2 "Female"  0 "No Information" 
+{txt}
+{com}. label values R0536300 vlR0536300
+{txt}
+{com}. 
+. label define vlR0536401 1 "1: January"  2 "2: February"  3 "3: March"  4 "4: April"  5 "5: May"  6 "6: June"  7 "7: July"  8 "8: August"  9 "9: September"  10 "10: October"  11 "11: November"  12 "12: December" 
+{txt}
+{com}. label values R0536401 vlR0536401
+{txt}
+{com}. 
+. label define vlR1194100 0 "0 TO 11: LESS THAN 12"  12 "12"  13 "13"  14 "14"  15 "15"  16 "16"  17 "17"  18 "18"  19 "19 TO 999: GREATER THAN 18" 
+{txt}
+{com}. label values R1194100 vlR1194100
+{txt}
+{com}. 
+. label define vlR1205400 0 "0"  1 "1"  2 "2"  3 "3"  4 "4"  5 "5"  6 "6"  7 "7"  8 "8"  9 "9"  10 "10"  11 "11"  12 "12"  13 "13"  14 "14"  15 "15"  16 "16"  17 "17"  18 "18"  19 "19"  20 "20 TO 99: 20+" 
+{txt}
+{com}. label values R1205400 vlR1205400
+{txt}
+{com}. 
+. label define vlR1235800 1 "Cross-sectional"  0 "Oversample" 
+{txt}
+{com}. label values R1235800 vlR1235800
+{txt}
+{com}. 
+. label define vlR1482600 1 "Black"  2 "Hispanic"  3 "Mixed Race (Non-Hispanic)"  4 "Non-Black / Non-Hispanic" 
+{txt}
+{com}. label values R1482600 vlR1482600
+{txt}
+{com}. /* Crosswalk for Reference number & Question name
+>  * Uncomment and edit this RENAME statement to rename variables for ease of use.
+>  * This command does not guarantee uniqueness
+>  */
+.   /* *start* */
+. 
+.   rename R0000100 PUBID_1997 
+{res}{txt}
+{com}.   rename R0320600 YHEA_100_1997   // YHEA-100
+{res}{txt}
+{com}.   rename R0322500 YHEA_2000_1997   // YHEA-2000
+{res}{txt}
+{com}.   rename R0322600 YHEA_2100_1997   // YHEA-2100
+{res}{txt}
+{com}.   rename R0322700 YHEA_2200_1997   // YHEA-2200
+{res}{txt}
+{com}.   rename R0358900 YSAQ_369_1997   // YSAQ-369
+{res}{txt}
+{com}.   rename R0359100 YSAQ_371_1997   // YSAQ-371
+{res}{txt}
+{com}.   rename R0536300 SEX_1997EX_1997 
+{res}{txt}
+{com}.   rename R0536401 BDATE_M_1997 
+{res}{txt}
+{com}.   rename R0536402 BDATE_Y_1997 
+{res}{txt}
+{com}.   rename R1194100 CV_AGE_INT_DATE_1997 
+{res}{txt}
+{com}.   rename R1205400 CV_HH_SIZE_1997 
+{res}{txt}
+{com}.   rename R1235800 CV_SAMPLE_TYPE_1997 
+{res}{txt}
+{com}.   rename R1482600 RACE_ETHNICITY_1997 
+{res}{txt}
+{com}. 
+. 
+.   /* *end* */  
+. /* To convert variable names to lower case use the TOLOWER command 
+>  *      (type findit tolower and follow the links to install).
+>  * TOLOWER VARLIST will change listed variables to lower case; 
+>  *  TOLOWER without a specified variable list will convert all variables in the dataset to lower case
+>  */
+. tolower
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}.         
+. ** RENAME VARIABLES
+.         ren (yhea_100_1997 yhea_2000_1997 yhea_2100_1997 yhea_2200_1997 sex_1997 ///
+>         bdate_m_1997 bdate_y_1997 cv_hh_size_1997 race_ethnicity_1997 ///
+>         cv_age_int_date_1997 ysaq_371_1997 ysaq_369_1997) ///
+>         (health feet inches weight male birth_month birth_year hh_size race age ///
+>         n_marij ever_marij)
+{res}{txt}
+{com}.         
+. ** FIX MARIJUANA VARIABLE
+.         replace n_marij = 0 if ever_marij==0
+{txt}(7,148 real changes made)
+
+{com}.         
+. ** REPLACE NEGATIVE VALUES WITH MISSINGS
+.         foreach var of varlist _all {c -(}
+{txt}  2{com}.                 replace `var' = . if `var'<0
+{txt}  3{com}.         {c )-}
+{txt}(0 real changes made)
+(5 real changes made, 5 to missing)
+(194 real changes made, 194 to missing)
+(221 real changes made, 221 to missing)
+(275 real changes made, 275 to missing)
+(41 real changes made, 41 to missing)
+(51 real changes made, 51 to missing)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+{com}.         
+. ** COMPUTE BMI
+.         replace inches = inches + (feet*12)
+{txt}(8,763 real changes made, 11 to missing)
+
+{com}.         gen bmi = (weight*703)/(inches^2)
+{txt}(442 missing values generated)
+
+{com}.         
+. ** FIX MALE VAR
+.         tempvar t1
+{txt}
+{com}.         gen `t1' = male == 1
+{txt}
+{com}.         drop male
+{txt}
+{com}.         gen male = `t1'
+{txt}
+{com}.         
+. ** CREATE WHITE VAR
+.         gen white = race == 4
+{txt}
+{com}.         
+. ** LABEL VARS
+.         lab var bmi "Body mass index"
+{txt}
+{com}.         lab var male "=1 if respondent is male"
+{txt}
+{com}.         lab var white "=1 if respondent is white, non-Hispanic"
+{txt}
+{com}.         lab var age "Age (in discrete years) at first interview"
+{txt}
+{com}.         lab var hh_size "Household size (1 to 16)"
+{txt}
+{com}.         lab var health "Self-report rating of health (1 to 5)"
+{txt}
+{com}.         lab var n_marij "N of days used marijuana in past 30 days"
+{txt}
+{com}.         
+. ** KEEP ONLY NEEDED VARS
+.         keep bmi male white age hh_size health n_marij
+{txt}
+{com}.         
+. ** CLEAN UP
+.         aorder
+{txt}
+{com}.         
+. ** SAVE NEW DATA FILE
+.         cd "G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data"
+{res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data
+{txt}
+{com}.         save nlsy97_mi_tutorial.dta, replace
+{txt}{p 0 4 2}
+file {bf}
+nlsy97_mi_tutorial.dta{rm}
+saved
+{p_end}
+
+{com}.         
+. ** CLOSE LOG
+.         cap log close
+{smcl}
+{com}{sf}{ul off}
