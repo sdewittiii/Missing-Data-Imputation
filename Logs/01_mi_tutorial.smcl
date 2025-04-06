@@ -3,7 +3,7 @@
       name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Logs\01_mi_tutorial.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 6 Apr 2025, 17:07:21
+ {txt}opened on:  {res} 6 Apr 2025, 18:27:48
 {txt}
 {com}.         
 . ** CALL IN DATA
@@ -17,15 +17,14 @@
 .         capture which schemepack
 {txt}
 {com}.         if _rc {c -(}
-.                 ssc install schemepack
+.                 ssc install schemepack // This installs schemepack if not already installed. Just using it for a figure below
 {txt}checking {hilite:schemepack} consistency and verifying not already installed...
 all files already exist and are up to date.
 {com}.         {c )-}
 {txt}
 {com}. 
-.         
 . ** SUMMARY OF MISSINGNESS
-.         summarize bmi1 male white age1 hhsize1 nmarij1 health1, sep(0) 
+.         summarize bmi1 male white age1 hhsize1 nmarij1 health1, sep(0) // Summarize variables in data
 
 {txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
 {hline 13}{c +}{hline 57}
@@ -37,11 +36,11 @@ all files already exist and are up to date.
 {txt}{space 5}nmarij1 {c |}{res}      8,933    .8091347    3.910233          0         30
 {txt}{space 5}health1 {c |}{res}      8,979    1.942533    .9097347          1          5
 {txt}
-{com}. 
-.         egen nmiss=rowmiss(bmi1 male white age1 hhsize1 nmarij1 health1)
+{com}.         
+.         egen nmiss=rowmiss(bmi1 male white age1 hhsize1 nmarij1 health1) // Count missing obs across rows
 {txt}
 {com}. 
-.         tabulate nmiss
+.         tabulate nmiss // Tab missing value count
 
       {txt}nmiss {c |}      Freq.     Percent        Cum.
 {hline 12}{c +}{hline 35}
@@ -66,10 +65,10 @@ Number of obs       = {res}8984
 {com}.         
 . ** LOGISTIC REGRESSION MAR TESTS
 .         ** CREATE DUMMY MISSING FLAG
-.                 gen bmi1_miss = bmi1 == .
+.                 gen bmi1_miss = bmi1 == . // Shortcut syntax for dummy variable
 {txt}
 {com}.         ** ESTIMATE LOGISTIC REGRESSION PREMDICTING MISSINGNESS IN BMI
-.                 logit bmi1_miss male white age1 hhsize nmarij1 health1
+.                 logit bmi1_miss male white age1 hhsize nmarij1 health1 // Estimate logistic regression predicting missingness in bmi1 
 
 {res}{txt}Iteration 0:{space 3}log likelihood = {res:-1726.8654}  
 Iteration 1:{space 3}log likelihood = {res: -1621.317}  
@@ -97,7 +96,7 @@ Iteration 5:{space 3}log likelihood = {res:-1603.7858}
 
 {com}.                 
 . ** COMPLETE CASE ANALYSIS
-.         regress bmi1 male white age1 hhsize1 nmarij1 health1
+.         regress bmi1 male white age1 hhsize1 nmarij1 health1 // Estimate regression using listwise deletion
 
 {txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,500
 {txt}{hline 13}{c +}{hline 34}   F(6, 8493)      = {res}   118.12
@@ -120,11 +119,11 @@ Iteration 5:{space 3}log likelihood = {res:-1603.7858}
 {res}{txt}
 {com}.                 
 . ** SETTING IMPUTATION PARAMETERS
-.         mi set flong
+.         mi set flong // Sets how to store MI data - long means to append at the end of current data set 
 {txt}
-{com}.         mi register regular male white age1 hhsize1
+{com}.         mi register regular male white age1 hhsize1 // Register variables without missing data 
 {txt}
-{com}.         mi register imputed bmi1 nmarij1 health1 
+{com}.         mi register imputed bmi1 nmarij1 health1 // Register variables with missing data
 {res}{txt}{p}
 (484 {it:m}=0 obs now marked as incomplete)
 {p_end}
@@ -133,7 +132,7 @@ Iteration 5:{space 3}log likelihood = {res:-1603.7858}
 
 {txt}{p 0 7 1}
 Style: {res:flong}{break}
-{break}last {bf:mi update} 06apr2025 17:07:26,
+{break}last {bf:mi update} 06apr2025 18:27:53,
 0 seconds ago
 
 Observations:
@@ -171,7 +170,7 @@ id nmiss bmi1_miss)
 
 {com}.         
 . ** USING MISSTABLE TO SUMMARIZE MISSINGNESS
-.         mi misstable summarize
+.         mi misstable summarize // Use misstable to summarize what variables are missing data 
 {txt}{col 64}Obs<.
 {col 49}{c TLC}{hline 30}
 {col 16}{c |}{col 49}{c |} Unique
@@ -182,7 +181,7 @@ id nmiss bmi1_miss)
        nmarij1 {c |}{res}        51{txt}{space 10}{res}     8,933{txt}  {c |}     31          0          30
   {hline 13}{c BT}{hline 32}{c BT}{hline 30}
 
-{com}.         mi misstable patterns
+{com}.         mi misstable patterns // Use misstable to show patterns - 1s indicate missing, 0s are nonmissing
 {res}
    {txt}Missing-value patterns
      (1 means complete)
@@ -211,7 +210,7 @@ Variables are
 {com}.         
 . ** RUNNING THE IMPUTATION MODELS
 .         mi impute chained (regress) bmi1 (ologit) health1 (poisson) nmarij1 = male ///
->         white age1 hhsize1, add(5) rseed(04062025)
+>         white age1 hhsize1, add(5) rseed(04062025) 
 {res}
 {txt}Conditional models:
 {p 11 21 2}
@@ -249,9 +248,16 @@ Multivariate imputation{txt}{col 45}{ralign 12:Imputations }= {res}       5
 {p 0 1 1 66}(Complete + Incomplete = Total; Imputed is the minimum across {it:m}
  of the number of filled-in observations.){p_end}
 
-{com}.         
+{com}.         /* This runs the MICE function, specifying OLS to impute missing values in
+>         bmi1, ordered logistic regression to predict missing values in health1, and 
+>         a Poisson model to predict missing variables in nmarij1. Note that "chained"
+>         here means ordering of the conditional models matters - first missing values
+>         of health are imputed, then the new health1 variable with its imputed values
+>         is used to impute missing values for nmarij1, and then helath1 and nmarij1 
+>         with their imputed values are used to impute missing values for bmi1. */
+.         
 . ** HOW ARE THE DIFFERENT DATA SETS STORED?
-.         tabulate _mi_m
+.         tabulate _mi_m // Just shows that there are now six data sets in storage, 5 with imputed values and the original
 
       {txt}_mi_m {c |}      Freq.     Percent        Cum.
 {hline 12}{c +}{hline 35}
@@ -266,7 +272,7 @@ Multivariate imputation{txt}{col 45}{ralign 12:Imputations }= {res}       5
 {txt}
 {com}.         
 . ** INSPECTING THE HEALTH VARIABLE ACROSS IMPUTED DATA
-.         tabulate health1 _mi_m, col
+.         tabulate health1 _mi_m, col // Another way to look across data sets - see that the original data sets has missing values for health1 whereas the imputed data sets do not
 {txt}
 {c TLC}{hline 19}{c TRC}
 {c |} Key{col 21}{c |}
@@ -306,9 +312,11 @@ Self-repor {c |}
 >         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==4) ///
 >         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==5, legend(off) ///
 >         scheme(gg_tableau)), ///
->         xtitle("BMI Value") ytitle("Kernal Density")
+>         xtitle("BMI Value") ytitle("Kernel Density")
 {res}{txt}
-{com}.         
+{com}.         /* Stacking multiple kernel density plots to show that the distributions of 
+>         BMI are very similar across imputations. */
+.         
 . ** TAKING A CLOSER LOOK AT THREE YOUTH'S VALUES
 .         sort id _mi_m
 {txt}
@@ -340,9 +348,13 @@ Self-repor {c |}
   {c |} {res}4686       5   21.93098      0       0     14       4   Excellent       0 {txt}{c |}
   {c BLC}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c BRC}
 
-{com}. 
+{com}.         /* It's helpful to take a closer look at a few different observations with 
+>         similar values on non-missing variables. Despite using similar values to 
+>         impute missing BMI, the random perturbations introduced into the imputation
+>         procedure result in different imputed values for each of these youth. */
+. 
 . ** ESTIMATE THE MULTIPLY IMPUTED REGRESSION MODELS
-.         mi estimate: regress bmi1 male white age1 hhsize1 health1 nmarij1 
+.         mi estimate: regress bmi1 male white age1 hhsize1 health1 nmarij1  // This gives us averaged results across the imputed data sets
 {res}
 {txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}         5
 {txt}Linear regression{col 49}Number of obs{col 67}= {res}     8,984
@@ -369,7 +381,7 @@ Self-repor {c |}
 {res}{txt}
 {com}.         
 . ** GET VARIANCE ESTIMATES
-.         mi estimate, vartable: regress bmi1 male white age1 hhsize1 health1 nmarij1
+.         mi estimate, vartable: regress bmi1 male white age1 hhsize1 health1 nmarij1 
 {res}
 {txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}         5
 {txt}Linear regression
@@ -412,7 +424,9 @@ Variance information
 {txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.98269{col 26}{space 2}  .506936{col 37}{space 1}   25.61{col 46}{space 3}0.000{col 54}{space 4} 11.98748{col 67}{space 3} 13.97791
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {res}{txt}
-{com}. 
+{com}.         /* Using the vartable option will get you the within and between imputation 
+>         variance for each coefficient - note where the option appears! */
+. 
 . ** ESTIMATE THE MODELS FOR EACH IMPUTED DATA SET
 .         forval i = 1/5 {c -(}
 {txt}  2{com}.                 di ""
@@ -543,7 +557,10 @@ This is the model using Imputation #5
 {res}
 
 {txt}
-{com}. 
-{txt}end of do-file
-
-{com}. 
+{com}.         /* Just used a forvalues loop to get regression out put for each imputation 
+>         for slide 27. */ 
+.         
+. ** CLOSE LOG
+.         cap log close
+{smcl}
+{com}{sf}{ul off}
