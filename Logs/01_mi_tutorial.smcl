@@ -1,0 +1,549 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Logs\01_mi_tutorial.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 6 Apr 2025, 17:07:21
+{txt}
+{com}.         
+. ** CALL IN DATA
+.         cd "`mydir'`datadir'"
+{res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data
+{txt}
+{com}.         use nlsy97_mi_tutorial.dta, clear
+{txt}
+{com}.         
+. ** INSTALL SCHEMEPACK IF NOT INSTALLED
+.         capture which schemepack
+{txt}
+{com}.         if _rc {c -(}
+.                 ssc install schemepack
+{txt}checking {hilite:schemepack} consistency and verifying not already installed...
+all files already exist and are up to date.
+{com}.         {c )-}
+{txt}
+{com}. 
+.         
+. ** SUMMARY OF MISSINGNESS
+.         summarize bmi1 male white age1 hhsize1 nmarij1 health1, sep(0) 
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 8}bmi1 {c |}{res}      8,542    21.94084    4.482877   .8078138   109.1938
+{txt}{space 8}male {c |}{res}      8,984    .5119101     .499886          0          1
+{txt}{space 7}white {c |}{res}      8,984    .5192565    .4996569          0          1
+{txt}{space 8}age1 {c |}{res}      8,984    14.31256    1.483005         12         18
+{txt}{space 5}hhsize1 {c |}{res}      8,984    4.548976    1.540158          1         16
+{txt}{space 5}nmarij1 {c |}{res}      8,933    .8091347    3.910233          0         30
+{txt}{space 5}health1 {c |}{res}      8,979    1.942533    .9097347          1          5
+{txt}
+{com}. 
+.         egen nmiss=rowmiss(bmi1 male white age1 hhsize1 nmarij1 health1)
+{txt}
+{com}. 
+.         tabulate nmiss
+
+      {txt}nmiss {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}      8,500       94.61       94.61
+{txt}          1 {c |}{res}        472        5.25       99.87
+{txt}          2 {c |}{res}         10        0.11       99.98
+{txt}          3 {c |}{res}          2        0.02      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}      8,984      100.00
+{txt}
+{com}. 
+. ** RUN LITTLE'S MCAR TEST
+.         mcartest bmi1 male white age1 hhsize1 nmarij1 health1 // Estimate simple version of Little's Test
+{res}
+{txt}Little's MCAR test
+
+Number of obs       = {res}8984
+{txt}Chi-square distance = {res}290.8658    
+{txt}Degrees of freedom  = {res}32
+{txt}Prob > chi-square   = {res}0.0000
+{txt}
+{com}.         
+. ** LOGISTIC REGRESSION MAR TESTS
+.         ** CREATE DUMMY MISSING FLAG
+.                 gen bmi1_miss = bmi1 == .
+{txt}
+{com}.         ** ESTIMATE LOGISTIC REGRESSION PREMDICTING MISSINGNESS IN BMI
+.                 logit bmi1_miss male white age1 hhsize nmarij1 health1
+
+{res}{txt}Iteration 0:{space 3}log likelihood = {res:-1726.8654}  
+Iteration 1:{space 3}log likelihood = {res: -1621.317}  
+Iteration 2:{space 3}log likelihood = {res:-1604.1098}  
+Iteration 3:{space 3}log likelihood = {res:-1603.7892}  
+Iteration 4:{space 3}log likelihood = {res:-1603.7858}  
+Iteration 5:{space 3}log likelihood = {res:-1603.7858}  
+{res}
+{txt}{col 1}Logistic regression{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:8,931}
+{txt}{col 57}{lalign 13:LR chi2({res:6})}{col 70} = {res}{ralign 6:246.16}
+{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-1603.7858}{txt}{col 57}{lalign 13:Pseudo R2}{col 70} = {res}{ralign 6:0.0713}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   bmi1_miss{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2}-.6642327{col 26}{space 2} .1049481{col 37}{space 1}   -6.33{col 46}{space 3}0.000{col 54}{space 4}-.8699273{col 67}{space 3}-.4585382
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-.7254703{col 26}{space 2} .1072779{col 37}{space 1}   -6.76{col 46}{space 3}0.000{col 54}{space 4}-.9357312{col 67}{space 3}-.5152094
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2}  -.26961{col 26}{space 2} .0354231{col 37}{space 1}   -7.61{col 46}{space 3}0.000{col 54}{space 4}-.3390379{col 67}{space 3}-.2001821
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2} .1307457{col 26}{space 2} .0282328{col 37}{space 1}    4.63{col 46}{space 3}0.000{col 54}{space 4} .0754105{col 67}{space 3}  .186081
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0782266{col 26}{space 2} .0339251{col 37}{space 1}   -2.31{col 46}{space 3}0.021{col 54}{space 4}-.1447185{col 67}{space 3}-.0117347
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .2951991{col 26}{space 2} .0522942{col 37}{space 1}    5.64{col 46}{space 3}0.000{col 54}{space 4} .1927043{col 67}{space 3} .3976939
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .1974064{col 26}{space 2} .5273736{col 37}{space 1}    0.37{col 46}{space 3}0.708{col 54}{space 4}-.8362268{col 67}{space 3}  1.23104
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}.                 
+. ** COMPLETE CASE ANALYSIS
+.         regress bmi1 male white age1 hhsize1 nmarij1 health1
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,500
+{txt}{hline 13}{c +}{hline 34}   F(6, 8493)      = {res}   118.12
+{txt}       Model {c |} {res} 13159.5539         6  2193.25899   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 157691.945     8,493  18.5672842   {txt}R-squared       ={res}    0.0770
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0764
+{txt}       Total {c |} {res} 170851.499     8,499  20.1025413   {txt}Root MSE        =   {res}  4.309
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4347973{col 26}{space 2} .0940311{col 37}{space 1}    4.62{col 46}{space 3}0.000{col 54}{space 4} .2504735{col 67}{space 3}  .619121
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.129606{col 26}{space 2} .0945467{col 37}{space 1}  -11.95{col 46}{space 3}0.000{col 54}{space 4}-1.314941{col 67}{space 3}-.9442715
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .6007197{col 26}{space 2} .0319707{col 37}{space 1}   18.79{col 46}{space 3}0.000{col 54}{space 4} .5380495{col 67}{space 3}   .66339
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1029433{col 26}{space 2} .0310764{col 37}{space 1}   -3.31{col 46}{space 3}0.001{col 54}{space 4}-.1638606{col 67}{space 3}-.0420259
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0294775{col 26}{space 2} .0119333{col 37}{space 1}   -2.47{col 46}{space 3}0.014{col 54}{space 4}-.0528696{col 67}{space 3}-.0060854
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6655125{col 26}{space 2} .0522331{col 37}{space 1}   12.74{col 46}{space 3}0.000{col 54}{space 4} .5631228{col 67}{space 3} .7679021
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.91414{col 26}{space 2} .5040465{col 37}{space 1}   25.62{col 46}{space 3}0.000{col 54}{space 4} 11.92609{col 67}{space 3}  13.9022
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}.                 
+. ** SETTING IMPUTATION PARAMETERS
+.         mi set flong
+{txt}
+{com}.         mi register regular male white age1 hhsize1
+{txt}
+{com}.         mi register imputed bmi1 nmarij1 health1 
+{res}{txt}{p}
+(484 {it:m}=0 obs now marked as incomplete)
+{p_end}
+
+{com}.         mi describe
+
+{txt}{p 0 7 1}
+Style: {res:flong}{break}
+{break}last {bf:mi update} 06apr2025 17:07:26,
+0 seconds ago
+
+Observations:
+{col 4}Complete  {res}      8,500
+{txt}{col 4}Incomplete{res}        484{txt}  ({it:M} = {res:0} imputations)
+{col 4}{hline 21}
+{col 4}Total     {res}      8,984
+
+{txt}Variables:
+{p 3 12 1}
+Imputed: 3;
+bmi1({res:442})
+nmarij1({res:51})
+health1({res:5})
+{p_end}
+
+{p 3 12 1}
+Passive: 0
+{p_end}
+
+{p 3 12 1}
+Regular: 4;
+male white age1 hhsize1
+{p_end}
+
+{p 3 12 1}
+System:{bind:  }3;
+_mi_m _mi_id _mi_miss
+{p_end}
+
+{p 3 4 1}
+(there are 3 unregistered variables;
+id nmiss bmi1_miss)
+{p_end}
+
+{com}.         
+. ** USING MISSTABLE TO SUMMARIZE MISSINGNESS
+.         mi misstable summarize
+{txt}{col 64}Obs<.
+{col 49}{c TLC}{hline 30}
+{col 16}{c |}{col 49}{c |} Unique
+{col 7}Variable {c |}{col 22}Obs=.{col 32}Obs>.{col 42}Obs<.{col 49}{c |} values{col 65}Min{col 77}Max
+  {hline 13}{c +}{hline 32}{c +}{hline 30}
+          bmi1 {c |}{res}       442{txt}{space 10}{res}     8,542{txt}  {c |}   >500   .8078138    109.1938
+       health1 {c |}{res}         5{txt}{space 10}{res}     8,979{txt}  {c |}      5          1           5
+       nmarij1 {c |}{res}        51{txt}{space 10}{res}     8,933{txt}  {c |}     31          0          30
+  {hline 13}{c BT}{hline 32}{c BT}{hline 30}
+
+{com}.         mi misstable patterns
+{res}
+   {txt}Missing-value patterns
+     (1 means complete)
+
+{res}{txt}{space 2}            {c |}   Pattern
+{space 2}  Percent   {c |}  1  2  3
+{space 2}{hline 12}{c +}{hline 13}
+{space 2} {res:    95}%    {c |}  1  1  1
+{space 2}{space 12}{c |}
+{space 2} {res:     5}     {c |}  1  1  0
+{space 2}     <1     {c |}  1  0  1
+{space 2}     <1     {c |}  1  0  0
+{space 2}     <1     {c |}  0  0  0
+{space 2}     <1     {c |}  0  1  1
+{space 2}     <1     {c |}  0  0  1
+{space 2}{hline 12}{c +}{hline 13}
+{space 2}    {res:100}%    {c |}
+
+{p 2 16 2}
+Variables are
+{bind: (1) {res:health1}}
+{bind: (2) {res:nmarij1}}
+{bind: (3) {res:bmi1}}
+{p_end}
+
+{com}.         
+. ** RUNNING THE IMPUTATION MODELS
+.         mi impute chained (regress) bmi1 (ologit) health1 (poisson) nmarij1 = male ///
+>         white age1 hhsize1, add(5) rseed(04062025)
+{res}
+{txt}Conditional models:
+{p 11 21 2}
+{bf:health1}: ologit health1 nmarij1 bmi1 male white age1 hhsize1
+{p_end}
+{p 11 21 2}
+{bf:nmarij1}: poisson nmarij1 i.health1 bmi1 male white age1 hhsize1
+{p_end}
+{p 14 21 2}
+{bf:bmi1}: regress bmi1 i.health1 nmarij1 male white age1 hhsize1
+{p_end}
+
+{res}{txt}Performing chained iterations ...
+{res}{txt}
+Multivariate imputation{txt}{col 45}{ralign 12:Imputations }= {res}       5
+{txt}Chained equations{txt}{col 45}{ralign 12:added }= {res}       5
+{txt}Imputed: {it:m}=1 through {it:m}=5{txt}{col 45}{ralign 12:updated }= {res}       0
+
+{txt}Initialization: {res}monotone{txt}{col 45}{ralign 12:Iterations }= {res}      50
+{txt}{col 45}{ralign 12:burn-in }= {res}      10
+
+{txt}{p 14 15 2}{bf:bmi1}: linear regression{p_end}
+{txt}{p 11 15 2}{bf:health1}: ordered logistic regression{p_end}
+{txt}{p 11 15 2}{bf:nmarij1}: poisson regression{p_end}
+
+{txt}{hline 19}{c TT}{hline 35}{hline 11}
+{txt}{col 20}{c |}{center 46:  Observations per {it:m}}
+{txt}{col 20}{c LT}{hline 35}{c TT}{hline 10}
+{txt}{col 11}Variable {c |}{ralign 12:Complete }{ralign 13:Incomplete }{ralign 10:Imputed }{c |}{ralign 10:Total}
+{hline 19}{c +}{hline 35}{c +}{hline 10}
+{txt}{ralign 19:bmi1 }{c |}{res}       8542          442       442 {txt}{c |}{res}      8984
+{txt}{ralign 19:health1 }{c |}{res}       8979            5         5 {txt}{c |}{res}      8984
+{txt}{ralign 19:nmarij1 }{c |}{res}       8933           51        51 {txt}{c |}{res}      8984
+{txt}{hline 19}{c BT}{hline 35}{c BT}{hline 10}
+{p 0 1 1 66}(Complete + Incomplete = Total; Imputed is the minimum across {it:m}
+ of the number of filled-in observations.){p_end}
+
+{com}.         
+. ** HOW ARE THE DIFFERENT DATA SETS STORED?
+.         tabulate _mi_m
+
+      {txt}_mi_m {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}      8,984       16.67       16.67
+{txt}          1 {c |}{res}      8,984       16.67       33.33
+{txt}          2 {c |}{res}      8,984       16.67       50.00
+{txt}          3 {c |}{res}      8,984       16.67       66.67
+{txt}          4 {c |}{res}      8,984       16.67       83.33
+{txt}          5 {c |}{res}      8,984       16.67      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}     53,904      100.00
+{txt}
+{com}.         
+. ** INSPECTING THE HEALTH VARIABLE ACROSS IMPUTED DATA
+.         tabulate health1 _mi_m, col
+{txt}
+{c TLC}{hline 19}{c TRC}
+{c |} Key{col 21}{c |}
+{c LT}{hline 19}{c RT}
+{c |}{space 5}{it:frequency}{col 21}{c |}
+{c |}{space 1}{it:column percentage}{col 21}{c |}
+{c BLC}{hline 19}{c BRC}
+
+Self-repor {c |}
+  t rating {c |}
+ of health {c |}                               _mi_m
+  (1 to 5) {c |}         0          1          2          3          4          5 {c |}     Total
+{hline 11}{c +}{hline 66}{c +}{hline 10}
+ Excellent {c |}{res}     3,477      3,478      3,477      3,479      3,478      3,479 {txt}{c |}{res}    20,868 
+           {txt}{c |}{res}     38.72      38.71      38.70      38.72      38.71      38.72 {txt}{c |}{res}     38.72 
+{txt}{hline 11}{c +}{hline 66}{c +}{hline 10}
+ Very good {c |}{res}     3,025      3,026      3,026      3,026      3,027      3,028 {txt}{c |}{res}    18,158 
+           {txt}{c |}{res}     33.69      33.68      33.68      33.68      33.69      33.70 {txt}{c |}{res}     33.69 
+{txt}{hline 11}{c +}{hline 66}{c +}{hline 10}
+      Good {c |}{res}     2,020      2,022      2,023      2,020      2,021      2,020 {txt}{c |}{res}    12,126 
+           {txt}{c |}{res}     22.50      22.51      22.52      22.48      22.50      22.48 {txt}{c |}{res}     22.50 
+{txt}{hline 11}{c +}{hline 66}{c +}{hline 10}
+      Fair {c |}{res}       430        431        430        432        431        430 {txt}{c |}{res}     2,584 
+           {txt}{c |}{res}      4.79       4.80       4.79       4.81       4.80       4.79 {txt}{c |}{res}      4.79 
+{txt}{hline 11}{c +}{hline 66}{c +}{hline 10}
+      Poor {c |}{res}        27         27         28         27         27         27 {txt}{c |}{res}       163 
+           {txt}{c |}{res}      0.30       0.30       0.31       0.30       0.30       0.30 {txt}{c |}{res}      0.30 
+{txt}{hline 11}{c +}{hline 66}{c +}{hline 10}
+     Total {c |}{res}     8,979      8,984      8,984      8,984      8,984      8,984 {txt}{c |}{res}    53,899 
+           {txt}{c |}{res}    100.00     100.00     100.00     100.00     100.00     100.00 {txt}{c |}{res}    100.00 
+{txt}
+{com}.         
+. ** DISTRIBUTIONS OF IMPUTED BMI VALUES
+.         twoway (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==1) ///
+>         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==2) ///
+>         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==3) ///
+>         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==4) ///
+>         (kdensity bmi1 if bmi1>15 & bmi1<35 & _mi_m==5, legend(off) ///
+>         scheme(gg_tableau)), ///
+>         xtitle("BMI Value") ytitle("Kernal Density")
+{res}{txt}
+{com}.         
+. ** TAKING A CLOSER LOOK AT THREE YOUTH'S VALUES
+.         sort id _mi_m
+{txt}
+{com}.         list id _mi_m bmi1 male white age1 hhsize1 health1 nmarij1 if id==1220 | ///
+>         id ==3799 | id==4686, sep(6) compress noobs
+{txt}
+  {c TLC}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c TRC}
+  {c |} {res}  id   _mi_m       bmi1   male   white   age1   hhs~1     health1   nma~1 {txt}{c |}
+  {c LT}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c RT}
+  {c |} {res}1220       0          .      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}1220       1    27.2516      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}1220       2   21.93333      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}1220       3   29.84414      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}1220       4   21.59867      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}1220       5   16.73262      0       0     15       4   Excellent       0 {txt}{c |}
+  {c LT}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c RT}
+  {c |} {res}3799       0          .      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}3799       1   23.53563      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}3799       2   15.76416      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}3799       3    28.1094      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}3799       4   20.88433      0       0     15       4   Excellent       0 {txt}{c |}
+  {c |} {res}3799       5   14.58736      0       0     15       4   Excellent       0 {txt}{c |}
+  {c LT}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c RT}
+  {c |} {res}4686       0          .      0       0     14       4   Excellent       0 {txt}{c |}
+  {c |} {res}4686       1   30.47201      0       0     14       4   Excellent       0 {txt}{c |}
+  {c |} {res}4686       2   21.96477      0       0     14       4   Excellent       0 {txt}{c |}
+  {c |} {res}4686       3   19.90803      0       0     14       4   Excellent       0 {txt}{c |}
+  {c |} {res}4686       4   22.38813      0       0     14       4   Excellent       0 {txt}{c |}
+  {c |} {res}4686       5   21.93098      0       0     14       4   Excellent       0 {txt}{c |}
+  {c BLC}{hline 6}{c -}{hline 7}{c -}{hline 10}{c -}{hline 6}{c -}{hline 7}{c -}{hline 6}{c -}{hline 7}{c -}{hline 11}{c -}{hline 7}{c BRC}
+
+{com}. 
+. ** ESTIMATE THE MULTIPLY IMPUTED REGRESSION MODELS
+.         mi estimate: regress bmi1 male white age1 hhsize1 health1 nmarij1 
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}         5
+{txt}Linear regression{col 49}Number of obs{col 67}= {res}     8,984
+{txt}{col 49}Average RVI{col 67}= {res}    0.0407
+{txt}{col 49}Largest FMI{col 67}= {res}    0.1234
+{txt}{col 49}Complete DF{col 67}= {res}      8977
+{txt}DF adjustment:{ralign 15: {res:Small sample}}{col 49}DF:     min{col 67}= {res}    279.93
+{txt}{col 49}        avg{col 67}= {res}  4,310.20
+{txt}{col 49}        max{col 67}= {res}  8,349.80
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}   6{txt},{res} 4640.1{txt}){col 67}= {res}    118.18
+{txt}Within VCE type: {ralign 12:{res:OLS}}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4449222{col 26}{space 2} .0917525{col 37}{space 1}    4.85{col 46}{space 3}0.000{col 54}{space 4} .2650645{col 67}{space 3}   .62478
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.124086{col 26}{space 2} .0979497{col 37}{space 1}  -11.48{col 46}{space 3}0.000{col 54}{space 4}-1.316897{col 67}{space 3}-.9312743
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5935059{col 26}{space 2}  .032429{col 37}{space 1}   18.30{col 46}{space 3}0.000{col 54}{space 4} .5298016{col 67}{space 3} .6572102
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1015429{col 26}{space 2} .0300661{col 37}{space 1}   -3.38{col 46}{space 3}0.001{col 54}{space 4}-.1604835{col 67}{space 3}-.0426023
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6742898{col 26}{space 2} .0508076{col 37}{space 1}   13.27{col 46}{space 3}0.000{col 54}{space 4} .5746908{col 67}{space 3} .7738888
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0298846{col 26}{space 2} .0119142{col 37}{space 1}   -2.51{col 46}{space 3}0.012{col 54}{space 4}-.0532397{col 67}{space 3}-.0065294
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.98269{col 26}{space 2}  .506936{col 37}{space 1}   25.61{col 46}{space 3}0.000{col 54}{space 4} 11.98748{col 67}{space 3} 13.97791
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}.         
+. ** GET VARIANCE ESTIMATES
+.         mi estimate, vartable: regress bmi1 male white age1 hhsize1 health1 nmarij1
+{res}
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}         5
+{txt}Linear regression
+
+Variance information
+{res}{col 1}{text}{hline 13}{c TT}{hline 10}{hline 10}{hline 10}{hline 10}{hline 10}{hline 14}
+{col 14}{text}{c |}        Imputation variance{col 65}      Relative
+{res}{col 14}{text}{c |}    Within{col 25}   Between{col 35}     Total{col 45}       RVI{col 55}       FMI{col 65}    efficiency
+{res}{col 1}{text}{hline 13}{c +}{hline 10}{hline 10}{hline 10}{hline 10}{hline 10}{hline 14}
+{space 8}male {c |}{col 14}{result}{space 2} .008372{col 24}{space 2} .000039{col 34}{space 2} .008419{col 44}{space 2} .005588{col 54}{space 2} .005574{col 64}{space 6} .998887
+{txt}{space 7}white {c |}{col 14}{result}{space 2} .008468{col 24}{space 2} .000939{col 34}{space 2} .009594{col 44}{space 2} .133024{col 54}{space 2}  .12345{col 64}{space 6} .975905
+{txt}{space 8}age1 {c |}{col 14}{result}{space 2} .000964{col 24}{space 2} .000073{col 34}{space 2} .001052{col 44}{space 2} .091424{col 54}{space 2} .086981{col 64}{space 6} .982901
+{txt}{space 5}hhsize1 {c |}{col 14}{result}{space 2}  .00089{col 24}{space 2} .000011{col 34}{space 2} .000904{col 44}{space 2} .015424{col 54}{space 2} .015307{col 64}{space 6} .996948
+{txt}{space 5}health1 {c |}{col 14}{result}{space 2}  .00255{col 24}{space 2} .000026{col 34}{space 2} .002581{col 44}{space 2} .012213{col 54}{space 2}  .01214{col 64}{space 6} .997578
+{txt}{space 5}nmarij1 {c |}{col 14}{result}{space 2} .000141{col 24}{space 2} 9.8e-07{col 34}{space 2} .000142{col 44}{space 2} .008377{col 54}{space 2} .008343{col 64}{space 6} .998334
+{txt}{space 7}_cons {c |}{col 14}{result}{space 2} .238886{col 24}{space 2} .015082{col 34}{space 2} .256984{col 44}{space 2} .075762{col 54}{space 2} .072738{col 64}{space 6} .985661
+{col 1}{text}{hline 13}{c BT}{hline 10}{hline 10}{hline 10}{hline 10}{hline 10}{hline 14}
+{res}
+
+{txt}Multiple-imputation estimates{col 49}Imputations{col 67}= {res}         5
+{txt}Linear regression{col 49}Number of obs{col 67}= {res}     8,984
+{txt}{col 49}Average RVI{col 67}= {res}    0.0407
+{txt}{col 49}Largest FMI{col 67}= {res}    0.1234
+{txt}{col 49}Complete DF{col 67}= {res}      8977
+{txt}DF adjustment:{ralign 15: {res:Small sample}}{col 49}DF:     min{col 67}= {res}    279.93
+{txt}{col 49}        avg{col 67}= {res}  4,310.20
+{txt}{col 49}        max{col 67}= {res}  8,349.80
+{txt}Model F test:{ralign 16: {res:Equal FMI}}{col 49}F({res}   6{txt},{res} 4640.1{txt}){col 67}= {res}    118.18
+{txt}Within VCE type: {ralign 12:{res:OLS}}{col 49}Prob > F{col 67}= {res}    0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4449222{col 26}{space 2} .0917525{col 37}{space 1}    4.85{col 46}{space 3}0.000{col 54}{space 4} .2650645{col 67}{space 3}   .62478
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.124086{col 26}{space 2} .0979497{col 37}{space 1}  -11.48{col 46}{space 3}0.000{col 54}{space 4}-1.316897{col 67}{space 3}-.9312743
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5935059{col 26}{space 2}  .032429{col 37}{space 1}   18.30{col 46}{space 3}0.000{col 54}{space 4} .5298016{col 67}{space 3} .6572102
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1015429{col 26}{space 2} .0300661{col 37}{space 1}   -3.38{col 46}{space 3}0.001{col 54}{space 4}-.1604835{col 67}{space 3}-.0426023
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6742898{col 26}{space 2} .0508076{col 37}{space 1}   13.27{col 46}{space 3}0.000{col 54}{space 4} .5746908{col 67}{space 3} .7738888
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0298846{col 26}{space 2} .0119142{col 37}{space 1}   -2.51{col 46}{space 3}0.012{col 54}{space 4}-.0532397{col 67}{space 3}-.0065294
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.98269{col 26}{space 2}  .506936{col 37}{space 1}   25.61{col 46}{space 3}0.000{col 54}{space 4} 11.98748{col 67}{space 3} 13.97791
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. ** ESTIMATE THE MODELS FOR EACH IMPUTED DATA SET
+.         forval i = 1/5 {c -(}
+{txt}  2{com}.                 di ""
+{txt}  3{com}.                 di ""
+{txt}  4{com}.                 di "This is the model using Imputation #`i'"
+{txt}  5{com}.                 regress bmi1 male white age1 hhsize1 health1 nmarij1 if _mi_m==`i'
+{txt}  6{com}.                 di ""
+{txt}  7{com}.                 di ""
+{txt}  8{com}.         {c )-}
+
+
+This is the model using Imputation #1
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,984
+{txt}{hline 13}{c +}{hline 34}   F(6, 8977)      = {res}   127.01
+{txt}       Model {c |} {res} 14147.4026         6  2357.90043   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res}  166659.27     8,977  18.5651409   {txt}R-squared       ={res}    0.0782
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0776
+{txt}       Total {c |} {res} 180806.672     8,983  20.1276491   {txt}Root MSE        =   {res} 4.3087
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4420202{col 26}{space 2} .0914368{col 37}{space 1}    4.83{col 46}{space 3}0.000{col 54}{space 4} .2627831{col 67}{space 3} .6212572
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.148457{col 26}{space 2} .0919573{col 37}{space 1}  -12.49{col 46}{space 3}0.000{col 54}{space 4}-1.328715{col 67}{space 3}   -.9682
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2}  .605449{col 26}{space 2} .0310199{col 37}{space 1}   19.52{col 46}{space 3}0.000{col 54}{space 4}  .544643{col 67}{space 3} .6662551
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.0983135{col 26}{space 2} .0298162{col 37}{space 1}   -3.30{col 46}{space 3}0.001{col 54}{space 4}-.1567601{col 67}{space 3}-.0398669
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6734568{col 26}{space 2} .0504659{col 37}{space 1}   13.34{col 46}{space 3}0.000{col 54}{space 4} .5745321{col 67}{space 3} .7723815
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0312862{col 26}{space 2}  .011857{col 37}{space 1}   -2.64{col 46}{space 3}0.008{col 54}{space 4}-.0545285{col 67}{space 3}-.0080438
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}   12.824{col 26}{space 2} .4884346{col 37}{space 1}   26.26{col 46}{space 3}0.000{col 54}{space 4} 11.86656{col 67}{space 3} 13.78145
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+
+
+
+This is the model using Imputation #2
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,984
+{txt}{hline 13}{c +}{hline 34}   F(6, 8977)      = {res}   121.93
+{txt}       Model {c |} {res} 13610.7998         6  2268.46663   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 167012.128     8,977  18.6044478   {txt}R-squared       ={res}    0.0754
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0747
+{txt}       Total {c |} {res} 180622.927     8,983  20.1071944   {txt}Root MSE        =   {res} 4.3133
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4433536{col 26}{space 2} .0915306{col 37}{space 1}    4.84{col 46}{space 3}0.000{col 54}{space 4} .2639328{col 67}{space 3} .6227745
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.121058{col 26}{space 2} .0920562{col 37}{space 1}  -12.18{col 46}{space 3}0.000{col 54}{space 4}-1.301509{col 67}{space 3}-.9406064
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5871662{col 26}{space 2} .0310531{col 37}{space 1}   18.91{col 46}{space 3}0.000{col 54}{space 4} .5262951{col 67}{space 3} .6480373
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.0995276{col 26}{space 2} .0298483{col 37}{space 1}   -3.33{col 46}{space 3}0.001{col 54}{space 4} -.158037{col 67}{space 3}-.0410181
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6765543{col 26}{space 2} .0505025{col 37}{space 1}   13.40{col 46}{space 3}0.000{col 54}{space 4} .5775578{col 67}{space 3} .7755507
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0300503{col 26}{space 2} .0118695{col 37}{space 1}   -2.53{col 46}{space 3}0.011{col 54}{space 4}-.0533172{col 67}{space 3}-.0067834
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 13.05592{col 26}{space 2} .4889842{col 37}{space 1}   26.70{col 46}{space 3}0.000{col 54}{space 4}  12.0974{col 67}{space 3} 14.01445
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+
+
+
+This is the model using Imputation #3
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,984
+{txt}{hline 13}{c +}{hline 34}   F(6, 8977)      = {res}   121.62
+{txt}       Model {c |} {res} 13563.8711         6  2260.64518   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 166867.228     8,977  18.5883066   {txt}R-squared       ={res}    0.0752
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0746
+{txt}       Total {c |} {res} 180431.099     8,983  20.0858399   {txt}Root MSE        =   {res} 4.3114
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4556867{col 26}{space 2} .0914939{col 37}{space 1}    4.98{col 46}{space 3}0.000{col 54}{space 4} .2763378{col 67}{space 3} .6350356
+{txt}{space 7}white {c |}{col 14}{res}{space 2} -1.13743{col 26}{space 2} .0920103{col 37}{space 1}  -12.36{col 46}{space 3}0.000{col 54}{space 4}-1.317791{col 67}{space 3}-.9570687
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5835166{col 26}{space 2} .0310387{col 37}{space 1}   18.80{col 46}{space 3}0.000{col 54}{space 4} .5226737{col 67}{space 3} .6443596
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1023137{col 26}{space 2} .0298356{col 37}{space 1}   -3.43{col 46}{space 3}0.001{col 54}{space 4}-.1607984{col 67}{space 3}-.0438291
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6691405{col 26}{space 2} .0504872{col 37}{space 1}   13.25{col 46}{space 3}0.000{col 54}{space 4}  .570174{col 67}{space 3} .7681071
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0296542{col 26}{space 2}  .011865{col 37}{space 1}   -2.50{col 46}{space 3}0.012{col 54}{space 4}-.0529123{col 67}{space 3} -.006396
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 13.14155{col 26}{space 2} .4886824{col 37}{space 1}   26.89{col 46}{space 3}0.000{col 54}{space 4} 12.18362{col 67}{space 3} 14.09948
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+
+
+
+This is the model using Imputation #4
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,984
+{txt}{hline 13}{c +}{hline 34}   F(6, 8977)      = {res}   121.86
+{txt}       Model {c |} {res} 13599.6208         6  2266.60346   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 166967.725     8,977  18.5995015   {txt}R-squared       ={res}    0.0753
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0747
+{txt}       Total {c |} {res} 180567.346     8,983   20.101007   {txt}Root MSE        =   {res} 4.3127
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2} .4439407{col 26}{space 2} .0915155{col 37}{space 1}    4.85{col 46}{space 3}0.000{col 54}{space 4} .2645493{col 67}{space 3} .6233321
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.072304{col 26}{space 2} .0920439{col 37}{space 1}  -11.65{col 46}{space 3}0.000{col 54}{space 4}-1.252732{col 67}{space 3}-.8918774
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5948605{col 26}{space 2} .0310473{col 37}{space 1}   19.16{col 46}{space 3}0.000{col 54}{space 4} .5340006{col 67}{space 3} .6557204
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1005645{col 26}{space 2} .0298433{col 37}{space 1}   -3.37{col 46}{space 3}0.001{col 54}{space 4}-.1590643{col 67}{space 3}-.0420648
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6818308{col 26}{space 2} .0505165{col 37}{space 1}   13.50{col 46}{space 3}0.000{col 54}{space 4} .5828068{col 67}{space 3} .7808547
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0299204{col 26}{space 2} .0118669{col 37}{space 1}   -2.52{col 46}{space 3}0.012{col 54}{space 4}-.0531822{col 67}{space 3}-.0066586
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.91554{col 26}{space 2} .4888413{col 37}{space 1}   26.42{col 46}{space 3}0.000{col 54}{space 4}  11.9573{col 67}{space 3} 13.87378
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+
+
+
+This is the model using Imputation #5
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     8,984
+{txt}{hline 13}{c +}{hline 34}   F(6, 8977)      = {res}   124.54
+{txt}       Model {c |} {res}  13895.499         6   2315.9165   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 166938.164     8,977  18.5962086   {txt}R-squared       ={res}    0.0768
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0762
+{txt}       Total {c |} {res} 180833.663     8,983  20.1306538   {txt}Root MSE        =   {res} 4.3123
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        bmi1{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}male {c |}{col 14}{res}{space 2}   .43961{col 26}{space 2} .0915093{col 37}{space 1}    4.80{col 46}{space 3}0.000{col 54}{space 4} .2602308{col 67}{space 3} .6189891
+{txt}{space 7}white {c |}{col 14}{res}{space 2}-1.141179{col 26}{space 2} .0920336{col 37}{space 1}  -12.40{col 46}{space 3}0.000{col 54}{space 4}-1.321586{col 67}{space 3}-.9607726
+{txt}{space 8}age1 {c |}{col 14}{res}{space 2} .5965371{col 26}{space 2} .0310464{col 37}{space 1}   19.21{col 46}{space 3}0.000{col 54}{space 4}  .535679{col 67}{space 3} .6573952
+{txt}{space 5}hhsize1 {c |}{col 14}{res}{space 2}-.1069953{col 26}{space 2} .0298407{col 37}{space 1}   -3.59{col 46}{space 3}0.000{col 54}{space 4}-.1654898{col 67}{space 3}-.0485008
+{txt}{space 5}health1 {c |}{col 14}{res}{space 2} .6704666{col 26}{space 2} .0505285{col 37}{space 1}   13.27{col 46}{space 3}0.000{col 54}{space 4} .5714192{col 67}{space 3}  .769514
+{txt}{space 5}nmarij1 {c |}{col 14}{res}{space 2}-.0285119{col 26}{space 2} .0118649{col 37}{space 1}   -2.40{col 46}{space 3}0.016{col 54}{space 4}-.0517697{col 67}{space 3} -.005254
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 12.97644{col 26}{space 2} .4888536{col 37}{space 1}   26.54{col 46}{space 3}0.000{col 54}{space 4} 12.01818{col 67}{space 3} 13.93471
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. 

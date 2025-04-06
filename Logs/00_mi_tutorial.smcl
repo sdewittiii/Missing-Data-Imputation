@@ -3,14 +3,14 @@
       name:  {res}<unnamed>
        {txt}log:  {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Logs\00_mi_tutorial.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 4 Apr 2025, 13:40:55
+ {txt}opened on:  {res} 6 Apr 2025, 15:58:39
 {txt}
 {com}.         
 . ** INFILE DICTIONARY FILE PROVIDED BY NLS EXPLORER      
-.         cd "G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\Cleanup Do Files"
-{res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\Cleanup Do Files
+.         cd "`mydir'`dictdir'" // Uses local macros defined above to change directory
+{res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Syntax\Do Files\From NLS Explorer
 {txt}
-{com}.         infile using default.dct
+{com}.         infile using default.dct // This calls a dictionary file that reads in text data
 
 {txt}infile dictionary {c -(}
   R0000100 "PUBID - YTH ID CODE 1997"
@@ -33,7 +33,7 @@
 
 {com}.         
 . ** APPLY LABEL VALUES FROM NLS EXPLORER-PROVIDED DO FILE
-.         do default-value-labels.do
+.         do default-value-labels.do // Processes the label do file NLS Explorer provides
 {txt}
 {com}. 
 . label define vlR0000100 0 "0"  1 "1 TO 999"  1000 "1000 TO 1999"  2000 "2000 TO 2999"  3000 "3000 TO 3999"  4000 "4000 TO 4999"  5000 "5000 TO 5999"  6000 "6000 TO 6999"  7000 "7000 TO 7999"  8000 "8000 TO 8999"  9000 "9000 TO 9999" 
@@ -149,21 +149,21 @@
 
 {com}.         
 . ** RENAME VARIABLES
-.         ren (yhea_100_1997 yhea_2000_1997 yhea_2100_1997 yhea_2200_1997 sex_1997 ///
->         bdate_m_1997 bdate_y_1997 cv_hh_size_1997 race_ethnicity_1997 ///
+.         ren (pubid_1997 yhea_100_1997 yhea_2000_1997 yhea_2100_1997 yhea_2200_1997 ///
+>         sex_1997 bdate_m_1997 bdate_y_1997 cv_hh_size_1997 race_ethnicity_1997 ///
 >         cv_age_int_date_1997 ysaq_371_1997 ysaq_369_1997) ///
->         (health feet inches weight male birth_month birth_year hh_size race age ///
->         n_marij ever_marij)
+>         (id health1 feet inches weight male birth_month birth_year hhsize1 race age1 ///
+>         nmarij1 ever_marij) // Renaming NLS variable names
 {res}{txt}
 {com}.         
 . ** FIX MARIJUANA VARIABLE
-.         replace n_marij = 0 if ever_marij==0
+.         replace nmarij = 0 if ever_marij==0 // Filling in valid zeroes for marijuana count variable
 {txt}(7,148 real changes made)
 
 {com}.         
 . ** REPLACE NEGATIVE VALUES WITH MISSINGS
 .         foreach var of varlist _all {c -(}
-{txt}  2{com}.                 replace `var' = . if `var'<0
+{txt}  2{com}.                 replace `var' = . if `var'<0 
 {txt}  3{com}.         {c )-}
 {txt}(0 real changes made)
 (5 real changes made, 5 to missing)
@@ -180,12 +180,17 @@
 (0 real changes made)
 (0 real changes made)
 
-{com}.         
+{com}.         /* Missing values in the NLSY97 are generally negative, assigning them all 
+>         to missing here. Wouldn't use this as a general practice with these data
+>         as "Valid Skips" are assigned values of -4 and they do have true values like
+>         the marijuana count variable has above (all the 0s I added were for rows
+>         with -4 values) */
+.         
 . ** COMPUTE BMI
-.         replace inches = inches + (feet*12)
+.         replace inches = inches + (feet*12) // They store height in two variables
 {txt}(8,763 real changes made, 11 to missing)
 
-{com}.         gen bmi = (weight*703)/(inches^2)
+{com}.         gen bmi1 = (weight*703)/(inches^2) // Compute bmi
 {txt}(442 missing values generated)
 
 {com}.         
@@ -196,42 +201,44 @@
 {txt}
 {com}.         drop male
 {txt}
-{com}.         gen male = `t1'
+{com}.         gen male = `t1' // Old example just flagged male with dummy variable
 {txt}
 {com}.         
 . ** CREATE WHITE VAR
-.         gen white = race == 4
+.         gen white = race == 4 // Shortcut syntax to make a dummy variable
 {txt}
 {com}.         
 . ** LABEL VARS
-.         lab var bmi "Body mass index"
+.         lab var id "Unique NLSY97 ID"
+{txt}
+{com}.         lab var bmi1 "Body mass index"
 {txt}
 {com}.         lab var male "=1 if respondent is male"
 {txt}
 {com}.         lab var white "=1 if respondent is white, non-Hispanic"
 {txt}
-{com}.         lab var age "Age (in discrete years) at first interview"
+{com}.         lab var age1 "Age (in discrete years) at first interview"
 {txt}
-{com}.         lab var hh_size "Household size (1 to 16)"
+{com}.         lab var hhsize1 "Household size (1 to 16)"
 {txt}
-{com}.         lab var health "Self-report rating of health (1 to 5)"
+{com}.         lab var health1 "Self-report rating of health (1 to 5)"
 {txt}
-{com}.         lab var n_marij "N of days used marijuana in past 30 days"
+{com}.         lab var nmarij1 "N of days used marijuana in past 30 days"
 {txt}
 {com}.         
 . ** KEEP ONLY NEEDED VARS
-.         keep bmi male white age hh_size health n_marij
+.         keep id bmi1 male white age1 hhsize1 health1 nmarij1 // Dropping all other vars to clean up the workspace
 {txt}
 {com}.         
 . ** CLEAN UP
-.         aorder
+.         aorder // More cleanup
 {txt}
 {com}.         
 . ** SAVE NEW DATA FILE
-.         cd "G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data"
+.         cd "`mydir'`datadir'" // Use locals to change directory
 {res}G:\My Drive\GitHub Projects\Missing-Data-Imputation\Data
 {txt}
-{com}.         save nlsy97_mi_tutorial.dta, replace
+{com}.         save nlsy97_mi_tutorial.dta, replace // Save new data
 {txt}{p 0 4 2}
 file {bf}
 nlsy97_mi_tutorial.dta{rm}
@@ -240,6 +247,6 @@ saved
 
 {com}.         
 . ** CLOSE LOG
-.         cap log close
+.         cap log close // Close log file
 {smcl}
 {com}{sf}{ul off}
